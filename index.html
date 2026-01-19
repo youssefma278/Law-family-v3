@@ -30,30 +30,48 @@
         >
           <span class="text-slate-900 font-black text-xl">L</span>
         </div>
-        <h1 class="text-2xl font-black tracking-tighter gold-text">
+        <h1
+          class="text-2xl font-black tracking-tighter gold-text hidden sm:block"
+        >
           LAW FAMILY
         </h1>
       </div>
 
-      <button
-        id="backBtn"
-        onclick="goBack()"
-        class="hidden bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 animate__animated animate__fadeIn"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4 rotate-180"
-          viewBox="0 0 20 20"
-          fill="currentColor"
+      <div class="flex items-center gap-4">
+        <div id="authControls" class="flex items-center gap-3">
+          <button
+            onclick="renderAuthForm()"
+            class="text-sm font-bold hover:text-[#c5a059] transition-colors"
+          >
+            تسجيل الدخول
+          </button>
+          <button
+            onclick="renderAuthForm(true)"
+            class="btn-gold px-5 py-2 rounded-full text-slate-900 text-sm font-black shadow-lg shadow-yellow-600/20"
+          >
+            إنشاء حساب
+          </button>
+        </div>
+
+        <button
+          id="backBtn"
+          onclick="goBack()"
+          class="hidden bg-white/5 hover:bg-white/10 border border-white/10 p-2.5 rounded-full transition-all animate__animated animate__fadeIn"
         >
-          <path
-            fill-rule="evenodd"
-            d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-            clip-rule="evenodd"
-          />
-        </svg>
-        <span>العودة للخلف</span>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 rotate-180"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
     </nav>
 
     <main id="app" class="container mx-auto px-6 py-12"></main>
@@ -61,10 +79,22 @@
     <footer
       class="mt-20 border-t border-white/5 py-10 text-center opacity-40 hover:opacity-100 transition-opacity"
     >
-      <p class="text-sm">© 2025 Law Family Platform. Built for Excellence.</p>
+      <p class="text-sm">© 2025 Law Family Platform. جميع الحقوق محفوظة.</p>
+      <div class="flex justify-center gap-4 mt-4">
+        <span class="text-[10px] text-gray-500 uppercase tracking-widest"
+          >Education</span
+        >
+        <span class="text-[10px] text-gray-500 uppercase tracking-widest"
+          >Law</span
+        >
+        <span class="text-[10px] text-gray-500 uppercase tracking-widest"
+          >Excellence</span
+        >
+      </div>
     </footer>
 
     <script src="data.js"></script>
+
     <script src="script.js"></script>
   </body>
 </html>

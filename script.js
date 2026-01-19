@@ -184,3 +184,230 @@ function goBack() {
 
 // تشغيل الصفحة الرئيسية عند التحميل
 window.onload = renderHome;
+
+// --- وظائف نظام الحساب ---
+
+// دالة لعرض صفحة "حسابي" أو صفحة "تسجيل الدخول" إذا لم يكن مسجلاً
+function toggleProfile() {
+  const user = JSON.parse(localStorage.getItem("lawFamilyUser"));
+  if (!user) {
+    renderAuthForm(); // إذا لم يسجل، اظهر صفحة الدخول
+  } else {
+    renderProfile(user); // إذا سجل، اظهر بياناته
+  }
+}
+
+// عرض نموذج تسجيل الدخول وإنشاء الحساب
+function renderAuthForm(isSignUp = false) {
+  navigationStack.push({ type: "home" });
+  backBtn.classList.remove("hidden");
+
+  app.innerHTML = `
+        <div class="max-w-md mx-auto glass-card p-10 animate__animated animate__fadeIn">
+            <h2 class="text-3xl font-black gold-text mb-6 text-center">${isSignUp ? "إنشاء حساب جديد" : "تسجيل الدخول"}</h2>
+            <form onsubmit="handleAuth(event, ${isSignUp})" class="space-y-4">
+                ${isSignUp ? `<div><label class="block mb-2 text-sm">الأسم الكامل</label><input type="text" id="regName" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#c5a059]"></div>` : ""}
+                <div>
+                    <label class="block mb-2 text-sm">رقم الهاتف</label>
+                    <input type="tel" id="userPhone" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#c5a059]" placeholder="01xxxxxxxxx">
+                </div>
+                <div>
+                    <label class="block mb-2 text-sm">كلمة المرور</label>
+                    <input type="password" id="userPass" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#c5a059]">
+                </div>
+                <button type="submit" class="w-full btn-gold py-4 rounded-xl font-bold text-slate-900 mt-4">${isSignUp ? "إنشاء الحساب" : "دخول"}</button>
+            </form>
+            <p class="text-center mt-6 text-gray-400 text-sm cursor-pointer" onclick="renderAuthForm(${!isSignUp})">
+                ${isSignUp ? "لديك حساب بالفعل؟ سجل دخولك" : "ليس لديك حساب؟ أنشئ حساباً الآن"}
+            </p>
+        </div>
+    `;
+}
+
+// التعامل مع عملية التسجيل والدخول
+function handleAuth(event, isSignUp) {
+  event.preventDefault();
+  const phone = document.getElementById("userPhone").value;
+  const pass = document.getElementById("userPass").value;
+
+  if (isSignUp) {
+    const name = document.getElementById("regName").value;
+    const newUser = {
+      name,
+      phone,
+      pass,
+      active: true,
+      joinDate: new Date().toLocaleDateString(),
+    };
+    localStorage.setItem("lawFamilyUser", JSON.stringify(newUser));
+    alert("تم إنشاء الحساب بنجاح!");
+  } else {
+    const savedUser = JSON.parse(localStorage.getItem("lawFamilyUser"));
+    if (savedUser && savedUser.phone === phone && savedUser.pass === pass) {
+      alert("تم تسجيل الدخول!");
+    } else {
+      alert("خطأ في البيانات أو الحساب غير موجود");
+      return;
+    }
+  }
+  location.reload(); // تحديث الصفحة لتنشيط الحالة
+}
+
+// مغير حالة الصورة (Base64)
+// --- متغيرات النظام ---
+let tempImageData = null;
+
+// --- دالة رفع ومعاينة الصورة ---
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    tempImageData = reader.result;
+    document.getElementById("previewImg").src = tempImageData;
+  };
+  if (file) reader.readAsDataURL(file);
+}
+
+// --- عرض نموذج التسجيل / الدخول ---
+function renderAuthForm(isSignUp = false) {
+  navigationStack.push({ type: "home" });
+  backBtn.classList.remove("hidden");
+  tempImageData = null;
+
+  app.innerHTML = `
+        <div class="max-w-md mx-auto glass-card p-10 animate__animated animate__fadeIn">
+            <h2 class="text-3xl font-black gold-text mb-8 text-center">${isSignUp ? "إنشاء حساب جديد" : "تسجيل الدخول"}</h2>
+            <form onsubmit="handleAuth(event, ${isSignUp})" class="space-y-4 text-right">
+                ${
+                  isSignUp
+                    ? `
+                <div class="image-upload-wrapper">
+                    <img id="previewImg" src="https://ui-avatars.com/api/?name=User&background=c5a059&color=fff" />
+                    <div class="upload-icon-badge">📷</div>
+                    <input type="file" accept="image/*" onchange="handleImageUpload(event)" class="absolute inset-0 opacity-0 cursor-pointer">
+                </div>
+                <div>
+                    <label class="block mb-1 text-xs text-gray-400 mr-2">الأسم الكامل</label>
+                    <input type="text" id="regName" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#c5a059]">
+                </div>
+                <div>
+                    <label class="block mb-1 text-xs text-gray-400 mr-2">البريد الإلكتروني</label>
+                    <input type="email" id="regEmail" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#c5a059]" placeholder="example@mail.com">
+                </div>`
+                    : ""
+                }
+                <div>
+                    <label class="block mb-1 text-xs text-gray-400 mr-2">رقم الهاتف</label>
+                    <input type="tel" id="userPhone" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#c5a059]" placeholder="01xxxxxxxxx">
+                </div>
+                <div>
+                    <label class="block mb-1 text-xs text-gray-400 mr-2">كلمة المرور</label>
+                    <input type="password" id="userPass" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#c5a059]">
+                </div>
+                <button type="submit" class="w-full btn-gold py-4 rounded-xl font-bold text-slate-900 mt-6 shadow-lg shadow-yellow-600/20">
+                    ${isSignUp ? "تأكيد التسجيل" : "دخول"}
+                </button>
+            </form>
+            <p class="text-center mt-6 text-gray-400 text-sm cursor-pointer hover:text-[#c5a059]" onclick="renderAuthForm(${!isSignUp})">
+                ${isSignUp ? "لديك حساب؟ سجل دخولك" : "لا تملك حساب؟ ابدأ الآن"}
+            </p>
+        </div>
+    `;
+}
+
+// --- معالجة البيانات وتخزينها ---
+function handleAuth(event, isSignUp) {
+  event.preventDefault();
+  const phone = document.getElementById("userPhone").value;
+  const pass = document.getElementById("userPass").value;
+
+  if (isSignUp) {
+    const name = document.getElementById("regName").value;
+    const email = document.getElementById("regEmail").value;
+    const newUser = {
+      name,
+      email,
+      phone,
+      pass,
+      active: true,
+      image:
+        tempImageData ||
+        `https://ui-avatars.com/api/?name=${name}&background=c5a059&color=fff`,
+      joinDate: new Date().toLocaleDateString("ar-EG"),
+    };
+    localStorage.setItem("lawFamilyUser", JSON.stringify(newUser));
+    alert("تم إنشاء الحساب بنجاح!");
+  } else {
+    const savedUser = JSON.parse(localStorage.getItem("lawFamilyUser"));
+    if (savedUser && savedUser.phone === phone && savedUser.pass === pass) {
+      alert("أهلاً بك مجدداً!");
+    } else {
+      alert("بيانات الدخول غير صحيحة");
+      return;
+    }
+  }
+  location.reload();
+}
+
+// --- عرض الملف الشخصي الكامل ---
+function renderProfile(user) {
+  navigationStack.push({ type: "home" });
+  backBtn.classList.remove("hidden");
+
+  app.innerHTML = `
+        <div class="max-w-2xl mx-auto glass-card p-10 animate__animated animate__zoomIn">
+            <div class="text-center mb-10">
+                <img src="${user.image}" class="w-32 h-32 rounded-full border-4 border-[#c5a059] mx-auto mb-4 object-cover" />
+                <h2 class="text-3xl font-black text-white">${user.name}</h2>
+                <div class="flex items-center justify-center gap-2 mt-2">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-green-500 text-sm font-bold">الحساب نشط</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
+                <div class="bg-white/5 p-5 rounded-2xl border border-white/5">
+                    <p class="text-gray-500 text-xs mb-1">البريد الإلكتروني</p>
+                    <p class="font-bold text-gray-200 truncate">${user.email || "غير متوفر"}</p>
+                </div>
+                <div class="bg-white/5 p-5 rounded-2xl border border-white/5">
+                    <p class="text-gray-500 text-xs mb-1">رقم الهاتف</p>
+                    <p class="font-bold text-gray-200">${user.phone}</p>
+                </div>
+                <div class="bg-white/5 p-5 rounded-2xl border border-white/5 md:col-span-2">
+                    <p class="text-gray-500 text-xs mb-1">تاريخ الانضمام للمنصة</p>
+                    <p class="font-bold text-gray-200">${user.joinDate}</p>
+                </div>
+            </div>
+            
+            <button onclick="handleLogout()" class="w-full mt-10 py-3 border border-red-500/30 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all font-bold">
+                تسجيل الخروج
+            </button>
+        </div>
+    `;
+}
+
+// --- تحديث حالة الـ Navbar ---
+function checkAuthStatus() {
+  const user = JSON.parse(localStorage.getItem("lawFamilyUser"));
+  if (user) {
+    document.getElementById("authControls").innerHTML = `
+            <div onclick="toggleProfile()" class="flex items-center gap-3 cursor-pointer bg-white/5 pl-4 pr-1 py-1 rounded-full border border-white/10 hover:border-[#c5a059] transition-all">
+                <img src="${user.image}" class="w-8 h-8 rounded-full object-cover border border-[#c5a059]" />
+                <span class="text-xs font-black text-white hidden sm:block">${user.name.split(" ")[0]}</span>
+            </div>
+        `;
+  }
+}
+
+function toggleProfile() {
+  const user = JSON.parse(localStorage.getItem("lawFamilyUser"));
+  user ? renderProfile(user) : renderAuthForm();
+}
+
+function handleLogout() {
+  localStorage.removeItem("lawFamilyUser");
+  location.reload();
+}
+
+window.addEventListener("load", checkAuthStatus);
