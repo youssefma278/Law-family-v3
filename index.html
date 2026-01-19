@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Law Family - منصة التميز التعليمي</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-gradient-animate min-h-screen">
+    <nav
+      class="sticky top-0 z-50 px-6 py-4 flex justify-between items-center bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10"
+    >
+      <div
+        class="flex items-center gap-3 cursor-pointer"
+        onclick="renderHome()"
+      >
+        <div
+          class="w-10 h-10 bg-gradient-to-tr from-[#c5a059] to-[#fde047] rounded-lg flex items-center justify-center shadow-lg shadow-yellow-900/20"
+        >
+          <span class="text-slate-900 font-black text-xl">L</span>
+        </div>
+        <h1 class="text-2xl font-black tracking-tighter gold-text">
+          LAW FAMILY
+        </h1>
+      </div>
+
+      <button
+        id="backBtn"
+        onclick="goBack()"
+        class="hidden bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 animate__animated animate__fadeIn"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 rotate-180"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <span>العودة للخلف</span>
+      </button>
+    </nav>
+
+    <main id="app" class="container mx-auto px-6 py-12"></main>
+
+    <footer
+      class="mt-20 border-t border-white/5 py-10 text-center opacity-40 hover:opacity-100 transition-opacity"
+    >
+      <p class="text-sm">© 2025 Law Family Platform. Built for Excellence.</p>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
