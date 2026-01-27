@@ -53,24 +53,32 @@ function renderCategory(catId) {
   let html = `
     <div class="mb-10 animate__animated animate__fadeIn">
         <h2 class="text-4xl font-black gold-text mb-4">${category.title}</h2>
-        <p class="text-gray-400">اختر التخصص الفرعي أو السنة الدراسية</p>
+        <p class="text-gray-400">اختر القسم المطلوب للبدء</p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
   `;
 
   category.subCategories.forEach((sub) => {
+    // التحقق إذا كان القسم يحتوي على رابط خارجي (تيليجرام مثلاً)
+    const isExternal = sub.externalUrl && sub.externalUrl !== "";
+    const clickAction = isExternal
+      ? `window.open('${sub.externalUrl}', '_blank')`
+      : `renderSubjects('${catId}', '${sub.id}')`;
+
     html += `
-      <div onclick="renderSubjects('${catId}', '${sub.id}')" 
-           class="glass-card p-10 flex justify-between items-center group cursor-pointer hover:bg-white/10 transition-all border-l-4 border-l-transparent hover:border-l-[#c5a059]">
-          <div>
-              <span class="text-xs text-[#c5a059] font-bold mb-2 block uppercase tracking-tighter">المرحلة</span>
-              <h3 class="text-2xl font-black text-white group-hover:tracking-wider transition-all">${sub.title}</h3>
-          </div>
-          <div class="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-[#c5a059] group-hover:text-slate-900 transition-all">
-              →
-          </div>
+  <div onclick="${clickAction}" 
+       class="glass-card p-10 flex justify-between items-center group cursor-pointer hover:bg-white/10 transition-all border-l-4 border-l-transparent hover:border-l-[#c5a059]">
+      <div>
+          <span class="text-xs text-[#c5a059] font-bold mb-2 block uppercase tracking-tighter">
+            ${isExternal ? "رابط خارجي" : "عرض المحتوى"}
+          </span>
+          <h3 class="text-2xl font-black text-white group-hover:tracking-wider transition-all">${sub.title}</h3>
       </div>
-    `;
+      <div class="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-[#c5a059] group-hover:text-slate-900 transition-all">
+          ${isExternal ? "🔗" : "→"}
+      </div>
+  </div>
+`;
   });
 
   if (category.subCategories.length === 0) {
@@ -187,77 +195,8 @@ window.onload = renderHome;
 
 // --- وظائف نظام الحساب ---
 
-// دالة لعرض صفحة "حسابي" أو صفحة "تسجيل الدخول" إذا لم يكن مسجلاً
-function toggleProfile() {
-  const user = JSON.parse(localStorage.getItem("lawFamilyUser"));
-  if (!user) {
-    renderAuthForm(); // إذا لم يسجل، اظهر صفحة الدخول
-  } else {
-    renderProfile(user); // إذا سجل، اظهر بياناته
-  }
-}
-
-// عرض نموذج تسجيل الدخول وإنشاء الحساب
-function renderAuthForm(isSignUp = false) {
-  navigationStack.push({ type: "home" });
-  backBtn.classList.remove("hidden");
-
-  app.innerHTML = `
-        <div class="max-w-md mx-auto glass-card p-10 animate__animated animate__fadeIn">
-            <h2 class="text-3xl font-black gold-text mb-6 text-center">${isSignUp ? "إنشاء حساب جديد" : "تسجيل الدخول"}</h2>
-            <form onsubmit="handleAuth(event, ${isSignUp})" class="space-y-4">
-                ${isSignUp ? `<div><label class="block mb-2 text-sm">الأسم الكامل</label><input type="text" id="regName" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#c5a059]"></div>` : ""}
-                <div>
-                    <label class="block mb-2 text-sm">رقم الهاتف</label>
-                    <input type="tel" id="userPhone" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#c5a059]" placeholder="01xxxxxxxxx">
-                </div>
-                <div>
-                    <label class="block mb-2 text-sm">كلمة المرور</label>
-                    <input type="password" id="userPass" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#c5a059]">
-                </div>
-                <button type="submit" class="w-full btn-gold py-4 rounded-xl font-bold text-slate-900 mt-4">${isSignUp ? "إنشاء الحساب" : "دخول"}</button>
-            </form>
-            <p class="text-center mt-6 text-gray-400 text-sm cursor-pointer" onclick="renderAuthForm(${!isSignUp})">
-                ${isSignUp ? "لديك حساب بالفعل؟ سجل دخولك" : "ليس لديك حساب؟ أنشئ حساباً الآن"}
-            </p>
-        </div>
-    `;
-}
-
-// التعامل مع عملية التسجيل والدخول
-function handleAuth(event, isSignUp) {
-  event.preventDefault();
-  const phone = document.getElementById("userPhone").value;
-  const pass = document.getElementById("userPass").value;
-
-  if (isSignUp) {
-    const name = document.getElementById("regName").value;
-    const newUser = {
-      name,
-      phone,
-      pass,
-      active: true,
-      joinDate: new Date().toLocaleDateString(),
-    };
-    localStorage.setItem("lawFamilyUser", JSON.stringify(newUser));
-    alert("تم إنشاء الحساب بنجاح!");
-  } else {
-    const savedUser = JSON.parse(localStorage.getItem("lawFamilyUser"));
-    if (savedUser && savedUser.phone === phone && savedUser.pass === pass) {
-      alert("تم تسجيل الدخول!");
-    } else {
-      alert("خطأ في البيانات أو الحساب غير موجود");
-      return;
-    }
-  }
-  location.reload(); // تحديث الصفحة لتنشيط الحالة
-}
-
-// مغير حالة الصورة (Base64)
-// --- متغيرات النظام ---
 let tempImageData = null;
 
-// --- دالة رفع ومعاينة الصورة ---
 function handleImageUpload(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
@@ -268,7 +207,6 @@ function handleImageUpload(event) {
   if (file) reader.readAsDataURL(file);
 }
 
-// --- عرض نموذج التسجيل / الدخول ---
 function renderAuthForm(isSignUp = false) {
   navigationStack.push({ type: "home" });
   backBtn.classList.remove("hidden");
@@ -315,7 +253,6 @@ function renderAuthForm(isSignUp = false) {
     `;
 }
 
-// --- معالجة البيانات وتخزينها ---
 function handleAuth(event, isSignUp) {
   event.preventDefault();
   const phone = document.getElementById("userPhone").value;
@@ -349,7 +286,6 @@ function handleAuth(event, isSignUp) {
   location.reload();
 }
 
-// --- عرض الملف الشخصي الكامل ---
 function renderProfile(user) {
   navigationStack.push({ type: "home" });
   backBtn.classList.remove("hidden");
@@ -387,16 +323,18 @@ function renderProfile(user) {
     `;
 }
 
-// --- تحديث حالة الـ Navbar ---
 function checkAuthStatus() {
   const user = JSON.parse(localStorage.getItem("lawFamilyUser"));
   if (user) {
-    document.getElementById("authControls").innerHTML = `
+    const authControls = document.getElementById("authControls");
+    if (authControls) {
+      authControls.innerHTML = `
             <div onclick="toggleProfile()" class="flex items-center gap-3 cursor-pointer bg-white/5 pl-4 pr-1 py-1 rounded-full border border-white/10 hover:border-[#c5a059] transition-all">
                 <img src="${user.image}" class="w-8 h-8 rounded-full object-cover border border-[#c5a059]" />
                 <span class="text-xs font-black text-white hidden sm:block">${user.name.split(" ")[0]}</span>
             </div>
         `;
+    }
   }
 }
 
