@@ -4,6 +4,13 @@
   --accent: #c5a059; /* اللون الذهبي */
 }
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden; /* يمنع ظهور شريط سكرول يمين ويسار */
+  position: relative;
+}
+
 body {
   font-family: "Cairo", sans-serif;
   background: #0f172a;
@@ -125,3 +132,4 @@ body {
   font-size: 14px;
   border: 2px solid #0f172a;
 }
+
