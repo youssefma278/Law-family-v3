@@ -1,9 +1,18 @@
 /**
- * 1. الإعدادات الأساسية
+ * 1. الإعدادات الأساسية ونظام History API للرجوع
  */
 const app = document.getElementById("app");
 const backBtn = document.getElementById("backBtn");
 let navigationStack = []; // لتخزين مسار المستخدم للرجوع للخلف
+
+// مستمع لحدث زر الرجوع في المتصفح أو الموبايل
+window.addEventListener('popstate', function(event) {
+    if (navigationStack.length > 0) {
+        // إذا ضغط المستخدم رجوع من الموبايل، ننفذ دالة goBack يدوياً
+        // نستخدم true لتجنب حذف حالة إضافية من التاريخ لأن المتصفح حذفها بالفعل
+        goBack(true); 
+    }
+});
 
 /**
  * 2. دالة عرض الصفحة الرئيسية (الأقسام الكبيرة)
@@ -11,6 +20,12 @@ let navigationStack = []; // لتخزين مسار المستخدم للرجوع
 function renderHome() {
   navigationStack = [];
   backBtn.classList.add("hidden");
+  
+  // تصفير التاريخ عند العودة للرئيسية
+  if (history.state) {
+      history.replaceState(null, "");
+  }
+
   let html = `
     <div class="text-center mb-16 animate__animated animate__fadeInDown">
         <span class="inline-block px-4 py-1 rounded-full bg-yellow-500/10 text-[#c5a059] text-xs font-bold tracking-widest mb-4">أهلاً بك في عائلة القانون</span>
@@ -48,6 +63,7 @@ function renderHome() {
 function renderCategory(catId) {
   const category = siteData.categories.find((c) => c.id === catId);
   navigationStack.push({ type: "home" });
+  history.pushState({ page: 'category' }, ""); // إضافة حالة للتاريخ
   backBtn.classList.remove("hidden");
 
   let html = `
@@ -59,7 +75,6 @@ function renderCategory(catId) {
   `;
 
   category.subCategories.forEach((sub) => {
-    // التحقق إذا كان القسم يحتوي على رابط خارجي (تيليجرام مثلاً)
     const isExternal = sub.externalUrl && sub.externalUrl !== "";
     const clickAction = isExternal
       ? `window.open('${sub.externalUrl}', '_blank')`
@@ -96,6 +111,7 @@ function renderSubjects(catId, subId) {
   const category = siteData.categories.find((c) => c.id === catId);
   const sub = category.subCategories.find((s) => s.id === subId);
   navigationStack.push({ type: "category", id: catId });
+  history.pushState({ page: 'subjects' }, ""); // إضافة حالة للتاريخ
 
   let html = `
     <div class="mb-10 animate__animated animate__fadeIn">
@@ -135,6 +151,7 @@ function renderContent(catId, subId, subjectId) {
   const sub = category.subCategories.find((s) => s.id === subId);
   const subject = sub.subjects.find((sj) => sj.id === subjectId);
   navigationStack.push({ type: "subjects", catId: catId, subId: subId });
+  history.pushState({ page: 'content' }, ""); // إضافة حالة للتاريخ
 
   let html = `
     <div class="glass-card p-10 mb-10 border-t-4 border-t-[#c5a059] animate__animated animate__fadeInDown">
@@ -181,8 +198,15 @@ function renderContent(catId, subId, subjectId) {
 /**
  * 6. نظام التنقل والرجوع للخلف
  */
-function goBack() {
+function goBack(isPopState = false) {
   if (navigationStack.length === 0) return;
+  
+  // إذا ضغط المستخدم على زر الموقع (وليس زر الموبايل)، نحذف الحالة من تاريخ المتصفح
+  if (!isPopState) {
+      history.back();
+      return; // الـ event listener سيتكفل بالباقي
+  }
+
   const lastPage = navigationStack.pop();
   if (lastPage.type === "home") renderHome();
   else if (lastPage.type === "category") renderCategory(lastPage.id);
@@ -209,6 +233,7 @@ function handleImageUpload(event) {
 
 function renderAuthForm(isSignUp = false) {
   navigationStack.push({ type: "home" });
+  history.pushState({ page: 'auth' }, "");
   backBtn.classList.remove("hidden");
   tempImageData = null;
 
@@ -288,6 +313,7 @@ function handleAuth(event, isSignUp) {
 
 function renderProfile(user) {
   navigationStack.push({ type: "home" });
+  history.pushState({ page: 'profile' }, "");
   backBtn.classList.remove("hidden");
 
   app.innerHTML = `
